@@ -24,13 +24,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .status{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600}
 .s-ok{background:#d4edda;color:#155724}
 .s-out{background:#fff3cd;color:#856404}
-th{background:#f8f9fa;font-weight:600;color:#666}
+.s-order{background:#cce5ff;color:#004085}
 .s-wait{background:#e2d9f3;color:#4a148c}
 .s-empty{background:#f8d7da;color:#721c24}
 .s-done{background:#d1ecf1;color:#0c5460}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th,td{padding:8px 6px;text-align:left;border-bottom:1px solid #eee}
-th{background:#f8f9fa;font-weight:600;color:#666;position:sticky;top:52px}
+th{background:#f8f9fa;font-weight:600;color:#666}
 .tab-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #eee;display:flex;z-index:100}
 .tab-bar a{flex:1;text-align:center;padding:10px 4px;text-decoration:none;color:#666;font-size:11px}
 .tab-bar a.active{color:#ff9900}
@@ -50,7 +50,7 @@ th{background:#f8f9fa;font-weight:600;color:#666;position:sticky;top:52px}
 <span id="user-display" style="font-size:12px;color:#aaa"></span>
 </nav>
 
-<!-- ===== ホーム ===== -->
+<!-- ホーム -->
 <div id="page-home" class="container">
 <div style="text-align:center;padding:20px 0">
 <h2 style="margin-bottom:4px">RFE装備品 在庫管理</h2>
@@ -59,13 +59,12 @@ th{background:#f8f9fa;font-weight:600;color:#666;position:sticky;top:52px}
 <div class="card" onclick="showPage('scan')" style="cursor:pointer;text-align:center"><div class="big-icon">📷</div><strong>QRスキャン</strong><p style="font-size:11px;color:#666">出庫・入庫</p></div>
 <div class="card" onclick="showPage('list')" style="cursor:pointer;text-align:center"><div class="big-icon">📊</div><strong>在庫一覧</strong><p style="font-size:11px;color:#666">状況確認</p></div>
 <div class="card" onclick="showPage('history')" style="cursor:pointer;text-align:center"><div class="big-icon">📋</div><strong>操作履歴</strong><p style="font-size:11px;color:#666">ログ確認</p></div>
-<div class="card" onclick="showPage('settings')" style="cursor:pointer;text-align:center"><div class="big-icon">⚙️</div><strong>設定</strong><p style="font-size:11px;color:#666">名前・ID</p></div>
+<div class="card" onclick="showPage('settings')" style="cursor:pointer;text-align:center"><div class="big-icon">⚙️</div><strong>設定</strong><p style="font-size:11px;color:#666">名前・ID・通知先</p></div>
 </div>
 </div>
 </div>
 
-<!-- ===== QRスキャン ===== -->
-<!-- ===== QRスキャン ===== -->
+<!-- QRスキャン -->
 <div id="page-scan" class="container hidden">
 <div class="card">
 <h2 style="margin-bottom:12px">📷 QRコードスキャン</h2>
@@ -98,7 +97,7 @@ th{background:#f8f9fa;font-weight:600;color:#666;position:sticky;top:52px}
 </div>
 </div>
 
-<!-- ===== 在庫一覧 ===== -->
+<!-- 在庫一覧 -->
 <div id="page-list" class="container hidden">
 <div class="card">
 <h2 style="margin-bottom:12px">📊 在庫一覧</h2>
@@ -112,14 +111,15 @@ th{background:#f8f9fa;font-weight:600;color:#666;position:sticky;top:52px}
 </div>
 </div>
 
-<!-- ===== 操作履歴 ===== -->
+<!-- 操作履歴 -->
 <div id="page-history" class="container hidden">
 <div class="card">
 <h2 style="margin-bottom:12px">📋 操作履歴</h2>
 <div id="history-list"></div>
 </div>
 </div>
-<!-- ===== 設定 ===== -->
+
+<!-- 設定 -->
 <div id="page-settings" class="container hidden">
 <div class="card">
 <h2 style="margin-bottom:12px">⚙️ ユーザー設定</h2>
@@ -129,7 +129,6 @@ th{background:#f8f9fa;font-weight:600;color:#666;position:sticky;top:52px}
 <button class="btn btn-primary" onclick="saveUser()">保存する</button>
 <div id="set-msg" class="alert alert-success hidden" style="margin-top:12px">✅ 保存しました!</div>
 </div>
-
 <div class="card">
 <h2 style="margin-bottom:12px">📧 通知先メールアドレス</h2>
 <p style="color:#666;margin-bottom:16px;font-size:13px">各操作後にメール通知する担当者のアドレスを設定します。</p>
@@ -144,21 +143,18 @@ th{background:#f8f9fa;font-weight:600;color:#666;position:sticky;top:52px}
 
 <!-- タブバー -->
 <div class="tab-bar">
-<a href="#" onclick="showPage('home')" id="tab-home" class="active"><div>🏠</div>ホーム</a>
-<a href="#" onclick="showPage('scan')" id="tab-scan"><div>📷</div>スキャン</a>
-<a href="#" onclick="showPage('list')" id="tab-list"><div>📊</div>一覧</a>
-<a href="#" onclick="showPage('history')" id="tab-history"><div>📋</div>履歴</a>
-<a href="#" onclick="showPage('settings')" id="tab-settings"><div>⚙️</div>設定</a>
+<a href="#" onclick="showPage('home');return false" id="tab-home" class="active"><div>🏠</div>ホーム</a>
+<a href="#" onclick="showPage('scan');return false" id="tab-scan"><div>📷</div>スキャン</a>
+<a href="#" onclick="showPage('list');return false" id="tab-list"><div>📊</div>一覧</a>
+<a href="#" onclick="showPage('history');return false" id="tab-history"><div>📋</div>履歴</a>
+<a href="#" onclick="showPage('settings');return false" id="tab-settings"><div>⚙️</div>設定</a>
 </div>
-
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
-// ===== クラウドDB設定 =====
-const BLOB_URL = 'https://jsonblob.com/api/jsonBlob/019e9049-93f9-73a1-b4c1-4557ef24db88';
-
-// デフォルトデータ(クラウドが読めない場合のフォールバック)
-const DEFAULT_ITEMS = [
+// ===== クラウドDB =====
+var BLOB_URL = 'https://jsonblob.com/api/jsonBlob/019e9049-93f9-73a1-b4c1-4557ef24db88';
+var DEFAULT_ITEMS = [
 {"code":"RFE-001","name":"冬用ジャケット","size":"S","par":3,"stock":3,"status":"在庫あり"},
 {"code":"RFE-002","name":"冬用ジャケット","size":"M","par":3,"stock":6,"status":"在庫あり"},
 {"code":"RFE-003","name":"冬用ジャケット","size":"L","par":3,"stock":1,"status":"在庫あり"},
@@ -211,43 +207,37 @@ const DEFAULT_ITEMS = [
 {"code":"RFE-050","name":"安全靴","size":"29","par":1,"stock":1,"status":"在庫あり"}
 ];
 
-let cloudData = null;
+var cloudData = null;
+var scanner = null;
+var currentItem = null;
+var currentAction = '';
 
-// ===== クラウド読み込み =====
-async function loadFromCloud(){
-  try {
-    let r = await fetch(BLOB_URL, {headers:{'Accept':'application/json'}});
-    if(r.ok){ cloudData = await r.json(); return true; }
-  } catch(e){ console.error('Cloud error:', e); }
-  // フォールバック: デフォルトデータ使用
-  cloudData = {items: JSON.parse(JSON.stringify(DEFAULT_ITEMS)), logs: []};
-  return false;
+// ===== クラウド =====
+function loadFromCloud(){
+  return fetch(BLOB_URL, {headers:{'Accept':'application/json'}})
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){ if(d) cloudData = d; else cloudData = {items:JSON.parse(JSON.stringify(DEFAULT_ITEMS)),logs:[]}; })
+    .catch(function(){ cloudData = {items:JSON.parse(JSON.stringify(DEFAULT_ITEMS)),logs:[]}; });
+}
+function saveToCloud(){
+  return fetch(BLOB_URL, {method:'PUT',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(cloudData)})
+    .then(function(r){ return r.ok; })
+    .catch(function(){ return false; });
 }
 
-// ===== クラウド保存 =====
-async function saveToCloud(){
-  try {
-    let r = await fetch(BLOB_URL, {
-      method:'PUT', headers:{'Content-Type':'application/json','Accept':'application/json'},
-      body: JSON.stringify(cloudData)
-    });
-    return r.ok;
-  } catch(e){ return false; }
-}
-
-// ===== データアクセス =====
+// ===== データ =====
 function getItems(){ return cloudData ? cloudData.items : DEFAULT_ITEMS; }
 function getLogs(){ return cloudData ? cloudData.logs : []; }
-function getUser(){
-  return { name: localStorage.getItem('rfe_user_name')||'', id: localStorage.getItem('rfe_user_id')||'' };
-}
+function getUser(){ return {name:localStorage.getItem('rfe_user_name')||'',id:localStorage.getItem('rfe_user_id')||''}; }
 
-// ===== ページ切替 =====
+// ===== ページ =====
 function showPage(page){
-  document.querySelectorAll('[id^="page-"]').forEach(p=>p.classList.add('hidden'));
+  var pages = document.querySelectorAll('[id^="page-"]');
+  for(var i=0;i<pages.length;i++) pages[i].classList.add('hidden');
   document.getElementById('page-'+page).classList.remove('hidden');
-  document.querySelectorAll('.tab-bar a').forEach(a=>a.classList.remove('active'));
-  let tab = document.getElementById('tab-'+page);
+  var tabs = document.querySelectorAll('.tab-bar a');
+  for(var i=0;i<tabs.length;i++) tabs[i].classList.remove('active');
+  var tab = document.getElementById('tab-'+page);
   if(tab) tab.classList.add('active');
   if(page==='list') renderList();
   if(page==='history') renderHistory();
@@ -255,59 +245,61 @@ function showPage(page){
   if(page==='scan') startScanner();
 }
 
-// ===== 在庫一覧 =====
-function renderList(filter=''){
-  let items = getItems();
-  let html = '';
-  items.forEach(item=>{
-    let text = (item.name+item.size).toLowerCase();
-    if(filter && !text.includes(filter.toLowerCase())) return;
-    let stockClass = (item.par>0 && item.stock<item.par) ? 'low-stock' : '';
-    let st = getStatusLabel(item);
-    html += `<tr><td>${item.name}</td><td>${item.size}</td><td class="${stockClass}">${item.stock}</td><td>${item.par||'-'}</td><td>${st}</td></tr>`;
-  });
+// ===== 一覧 =====
+function renderList(filter){
+  filter = filter || '';
+  var items = getItems();
+  var html = '';
+  for(var i=0;i<items.length;i++){
+    var item = items[i];
+    var text = (item.name+item.size).toLowerCase();
+    if(filter && text.indexOf(filter.toLowerCase())===-1) continue;
+    var stockClass = (item.par>0 && item.stock<item.par) ? 'low-stock' : '';
+    var st = getStatusLabel(item);
+    html += '<tr><td>'+item.name+'</td><td>'+item.size+'</td><td class="'+stockClass+'">'+item.stock+'</td><td>'+(item.par||'-')+'</td><td>'+st+'</td></tr>';
+  }
   document.getElementById('items-tbody').innerHTML = html || '<tr><td colspan="5" style="text-align:center;color:#666">データなし</td></tr>';
 }
 function filterList(q){ renderList(q); }
 function getStatusLabel(item){
-  let s = item.status || (item.stock>0?'在庫あり':'在庫なし');
-  let cls = {'在庫あり':'s-ok','出庫済':'s-out','手配中':'s-order','入庫待ち':'s-wait','在庫なし':'s-empty','レシーブ完了':'s-done'}[s]||'s-ok';
-  return `<span class="status ${cls}">${s}</span>`;
+  var s = item.status || (item.stock>0?'在庫あり':'在庫なし');
+  var cls = {'在庫あり':'s-ok','出庫済':'s-out','手配中':'s-order','入庫待ち':'s-wait','在庫なし':'s-empty','レシーブ完了':'s-done'}[s]||'s-ok';
+  return '<span class="status '+cls+'">'+s+'</span>';
 }
 
-// ===== 操作履歴 =====
+// ===== 履歴 =====
 function renderHistory(){
-  let logs = getLogs();
+  var logs = getLogs();
   if(!logs.length){ document.getElementById('history-list').innerHTML='<p style="text-align:center;color:#666;padding:20px">まだ履歴はありません</p>'; return; }
-  let html = '<table><thead><tr><th>日時</th><th>操作</th><th>品名</th><th>数量</th><th>担当</th></tr></thead><tbody>';
-  logs.slice(0,100).forEach(l=>{
-    let icon = {'出庫':'📤','補充手配':'🛒','入庫':'📥','レシーブ完了':'✅'}[l.action]||'';
-    html += `<tr><td style="font-size:11px;white-space:nowrap">${l.time}</td><td>${icon}${l.action}</td><td>${l.item_name} ${l.size}</td><td>${l.qty}</td><td>${l.user}</td></tr>`;
-  });
+  var html = '<table><thead><tr><th>日時</th><th>操作</th><th>品名</th><th>数量</th><th>担当</th></tr></thead><tbody>';
+  var icons = {'出庫':'📤','補充手配':'🛒','入庫':'📥','レシーブ完了':'✅'};
+  for(var i=0;i<Math.min(logs.length,100);i++){
+    var l = logs[i];
+    html += '<tr><td style="font-size:11px;white-space:nowrap">'+l.time+'</td><td>'+(icons[l.action]||'')+l.action+'</td><td>'+l.item_name+' '+l.size+'</td><td>'+l.qty+'</td><td>'+l.user+'</td></tr>';
+  }
   html += '</tbody></table>';
   document.getElementById('history-list').innerHTML = html;
 }
 
 // ===== 設定 =====
 function loadSettings(){
-  let u = getUser();
+  var u = getUser();
   document.getElementById('set-name').value = u.name;
   document.getElementById('set-id').value = u.id;
-  // 通知先メール読み込み
   document.getElementById('set-mail-order').value = localStorage.getItem('rfe_mail_order')||'';
   document.getElementById('set-mail-receive').value = localStorage.getItem('rfe_mail_receive')||'';
   document.getElementById('set-mail-complete').value = localStorage.getItem('rfe_mail_complete')||'';
   document.getElementById('set-mail-all').value = localStorage.getItem('rfe_mail_all')||'';
 }
 function saveUser(){
-  let name = document.getElementById('set-name').value.trim();
-  let id = document.getElementById('set-id').value.trim();
+  var name = document.getElementById('set-name').value.trim();
+  var id = document.getElementById('set-id').value.trim();
   if(!name||!id){ alert('名前とIDを両方入力してください'); return; }
   localStorage.setItem('rfe_user_name', name);
   localStorage.setItem('rfe_user_id', id);
   document.getElementById('set-msg').classList.remove('hidden');
   updateUserDisplay();
-  setTimeout(()=>document.getElementById('set-msg').classList.add('hidden'), 2000);
+  setTimeout(function(){document.getElementById('set-msg').classList.add('hidden');}, 2000);
 }
 function saveMailSettings(){
   localStorage.setItem('rfe_mail_order', document.getElementById('set-mail-order').value.trim());
@@ -315,62 +307,65 @@ function saveMailSettings(){
   localStorage.setItem('rfe_mail_complete', document.getElementById('set-mail-complete').value.trim());
   localStorage.setItem('rfe_mail_all', document.getElementById('set-mail-all').value.trim());
   document.getElementById('set-mail-msg').classList.remove('hidden');
-  setTimeout(()=>document.getElementById('set-mail-msg').classList.add('hidden'), 2000);
+  setTimeout(function(){document.getElementById('set-mail-msg').classList.add('hidden');}, 2000);
 }
+function updateUserDisplay(){
+  var u = getUser();
+  document.getElementById('user-display').textContent = u.name ? u.name+'('+u.id+')' : '';
 }
 
 // ===== QRスキャン =====
-let scanner = null;
-let currentItem = null;
-let currentAction = '';
-
 function startScanner(){
   document.getElementById('scan-result').classList.add('hidden');
   document.getElementById('scan-detail').classList.add('hidden');
   document.getElementById('scan-success').classList.add('hidden');
   document.getElementById('scan-msg').textContent = 'カメラ起動中...';
   if(scanner){ try{scanner.clear();}catch(e){} }
-  setTimeout(()=>{
+  setTimeout(function(){
     scanner = new Html5QrcodeScanner("reader",{fps:10,qrbox:{width:220,height:220}});
-    scanner.render(onScan, ()=>{});
+    scanner.render(onScan, function(){});
   }, 300);
 }
-async function onScan(code){
+function onScan(code){
   if(scanner) try{scanner.clear();}catch(e){}
-  await loadFromCloud();
-  let items = getItems();
-  currentItem = items.find(i=>i.code===code);
-  if(!currentItem){
-    document.getElementById('scan-msg').textContent = '⚠️ 未登録: '+code;
-    return;
-  }
-  document.getElementById('scan-msg').textContent = '✓ 読み取り完了';
-  document.getElementById('r-name').textContent = currentItem.name;
-  document.getElementById('r-size').textContent = currentItem.size;
-  document.getElementById('r-stock').textContent = currentItem.stock;
-  document.getElementById('r-par').textContent = currentItem.par||'-';
-  document.getElementById('r-status').innerHTML = getStatusLabel(currentItem);
-  document.getElementById('scan-result').classList.remove('hidden');
+  loadFromCloud().then(function(){
+    var items = getItems();
+    currentItem = null;
+    for(var i=0;i<items.length;i++){ if(items[i].code===code){ currentItem=items[i]; break; } }
+    if(!currentItem){
+      document.getElementById('scan-msg').textContent = '⚠️ 未登録: '+code;
+      return;
+    }
+    document.getElementById('scan-msg').textContent = '✓ 読み取り完了';
+    document.getElementById('r-name').textContent = currentItem.name;
+    document.getElementById('r-size').textContent = currentItem.size;
+    document.getElementById('r-stock').textContent = currentItem.stock;
+    document.getElementById('r-par').textContent = currentItem.par||'-';
+    document.getElementById('r-status').innerHTML = getStatusLabel(currentItem);
+    document.getElementById('scan-result').classList.remove('hidden');
+  });
 }
 
 function doAction(action){
-  let u = getUser();
+  var u = getUser();
   if(!u.name||!u.id){ alert('先に設定で名前・IDを登録してください'); showPage('settings'); return; }
   currentAction = action;
   if(action==='レシーブ完了'){ submitAction(); return; }
   document.getElementById('scan-result').classList.add('hidden');
   document.getElementById('scan-detail').classList.remove('hidden');
-  document.getElementById('d-title').textContent = {'出庫':'📤 出庫','補充手配':'🛒 補充手配','入庫':'📥 入庫'}[action];
+  var titles = {'出庫':'📤 出庫','補充手配':'🛒 補充手配','入庫':'📥 入庫'};
+  document.getElementById('d-title').textContent = titles[action];
   document.getElementById('d-date-group').classList.toggle('hidden', action!=='補充手配');
   document.getElementById('d-qty').value = 1;
   document.getElementById('d-note').value = '';
 }
 
-async function submitAction(){
-  let u = getUser();
-  let qty = parseInt(document.getElementById('d-qty').value)||1;
-  let note = document.getElementById('d-note').value;
-  let idx = cloudData.items.findIndex(i=>i.code===currentItem.code);
+function submitAction(){
+  var u = getUser();
+  var qty = parseInt(document.getElementById('d-qty').value)||1;
+  var note = document.getElementById('d-note').value;
+  var idx = -1;
+  for(var i=0;i<cloudData.items.length;i++){ if(cloudData.items[i].code===currentItem.code){idx=i;break;} }
 
   if(currentAction==='出庫'){
     cloudData.items[idx].stock = Math.max(0, cloudData.items[idx].stock - qty);
@@ -384,18 +379,20 @@ async function submitAction(){
     cloudData.items[idx].status = '在庫あり';
     qty = 0;
   }
+  currentItem = cloudData.items[idx];
 
-  let log = {action:currentAction, item_code:currentItem.code, item_name:currentItem.name, size:currentItem.size, qty:qty, user:u.name+'('+u.id+')', note:note, time:new Date().toLocaleString('ja-JP')};
+  var log = {action:currentAction,item_code:currentItem.code,item_name:currentItem.name,size:currentItem.size,qty:qty,user:u.name+'('+u.id+')',note:note,time:new Date().toLocaleString('ja-JP')};
   cloudData.logs.unshift(log);
-  if(cloudData.logs.length > 500) cloudData.logs = cloudData.logs.slice(0,500);
+  if(cloudData.logs.length>500) cloudData.logs=cloudData.logs.slice(0,500);
 
-  let saved = await saveToCloud();
-  document.getElementById('scan-detail').classList.add('hidden');
-  document.getElementById('scan-result').classList.add('hidden');
-  document.getElementById('scan-success').classList.remove('hidden');
-  document.getElementById('s-msg').textContent = currentAction + (saved ? ' 完了!' : ' 完了!(オフライン)');
-  // メール通知ボタン設定
-  showNotifyButton(currentAction, currentItem, qty);
+  saveToCloud().then(function(saved){
+    document.getElementById('scan-detail').classList.add('hidden');
+    document.getElementById('scan-result').classList.add('hidden');
+    document.getElementById('scan-success').classList.remove('hidden');
+    document.getElementById('s-msg').textContent = currentAction + (saved ? ' 完了!' : ' 完了!(オフライン)');
+    showNotifyButton(currentAction, currentItem, qty);
+  });
+}
 function cancelAction(){
   document.getElementById('scan-detail').classList.add('hidden');
   document.getElementById('scan-result').classList.remove('hidden');
@@ -405,44 +402,37 @@ function resetScan(){
   startScanner();
 }
 
-// ===== 初期化 =====
 // ===== メール通知 =====
 function showNotifyButton(action, item, qty){
-  let btn = document.getElementById('notify-btn');
-  // 操作に応じた通知先を取得
-  let toMap = {
+  var btn = document.getElementById('notify-btn');
+  var toMap = {
     '出庫': localStorage.getItem('rfe_mail_order')||'',
     '補充手配': localStorage.getItem('rfe_mail_receive')||'',
     '入庫': localStorage.getItem('rfe_mail_complete')||'',
     'レシーブ完了': localStorage.getItem('rfe_mail_all')||''
   };
-  let to = toMap[action];
+  var to = toMap[action];
   if(!to){ btn.style.display='none'; return; }
-  
-  let u = getUser();
-  let subject = encodeURIComponent('[RFE装備品] ' + action + ': ' + item.name + ' ' + item.size);
-  let body = encodeURIComponent(
-    '【RFE装備品 在庫管理 通知】\n\n' +
-    '操作: ' + action + '\n' +
-    '品名: ' + item.name + '\n' +
-    'サイズ: ' + item.size + '\n' +
-    '数量: ' + qty + '\n' +
-    '現在庫: ' + item.stock + ' / 定数 ' + (item.par||'-') + '\n' +
-    '担当: ' + u.name + '(' + u.id + ')\n' +
-    '日時: ' + new Date().toLocaleString('ja-JP') + '\n\n' +
+  var u = getUser();
+  var subject = encodeURIComponent('[RFE装備品] '+action+': '+item.name+' '+item.size);
+  var body = encodeURIComponent(
+    '【RFE装備品 在庫管理 通知】\n\n'+
+    '操作: '+action+'\n'+
+    '品名: '+item.name+'\n'+
+    'サイズ: '+item.size+'\n'+
+    '数量: '+qty+'\n'+
+    '現在庫: '+item.stock+' / 定数 '+(item.par||'-')+'\n'+
+    '担当: '+u.name+'('+u.id+')\n'+
+    '日時: '+new Date().toLocaleString('ja-JP')+'\n\n'+
     '---\nRFE装備品管理アプリより自動生成'
   );
-  btn.href = 'mailto:' + to + '?subject=' + subject + '&body=' + body;
+  btn.href = 'mailto:'+to+'?subject='+subject+'&body='+body;
   btn.style.display = 'block';
 }
 
 // ===== 初期化 =====
-async function init(){
-  updateUserDisplay();
-  await loadFromCloud();
-  renderList();
-}
-init();
+updateUserDisplay();
+loadFromCloud().then(function(){ renderList(); });
 </script>
 </body>
 </html>
