@@ -95,11 +95,12 @@ th{background:#f8f9fa;font-weight:600;color:#666;position:sticky;top:52px}
 <button class="btn btn-primary" style="margin-top:12px" onclick="resetScan()">次のスキャンへ</button>
 </div>
 </div>
-
-<!-- ===== 在庫一覧 ===== -->
-<div id="page-list" class="container hidden">
-<div class="card">
-<h2 style="margin-bottom:12px">📊 在庫一覧</h2>
+<div id="scan-success" class="card hidden" style="text-align:center">
+<div class="big-icon">✅</div>
+<h3 id="s-msg">完了!</h3>
+<a id="notify-btn" class="btn btn-primary" style="margin-top:12px;display:none;text-decoration:none" href="#">📧 関係者に通知する</a>
+<button class="btn btn-secondary" style="margin-top:8px" onclick="resetScan()">次のスキャンへ</button>
+</div>
 <input class="search-box" type="text" placeholder="🔍 品名・サイズで検索..." oninput="filterList(this.value)">
 <div style="overflow-x:auto">
 <table>
@@ -117,7 +118,6 @@ th{background:#f8f9fa;font-weight:600;color:#666;position:sticky;top:52px}
 <div id="history-list"></div>
 </div>
 </div>
-
 <!-- ===== 設定 ===== -->
 <div id="page-settings" class="container hidden">
 <div class="card">
@@ -127,6 +127,17 @@ th{background:#f8f9fa;font-weight:600;color:#666;position:sticky;top:52px}
 <div class="form-group"><label>社員ID</label><input type="text" id="set-id" placeholder="例: A12345"></div>
 <button class="btn btn-primary" onclick="saveUser()">保存する</button>
 <div id="set-msg" class="alert alert-success hidden" style="margin-top:12px">✅ 保存しました!</div>
+</div>
+
+<div class="card">
+<h2 style="margin-bottom:12px">📧 通知先メールアドレス</h2>
+<p style="color:#666;margin-bottom:16px;font-size:13px">各操作後にメール通知する担当者のアドレスを設定します。</p>
+<div class="form-group"><label>🛒 補充手配担当(出庫時に通知)</label><input type="email" id="set-mail-order" placeholder="例: hojyu@amazon.co.jp"></div>
+<div class="form-group"><label>📥 受領担当(手配完了時に通知)</label><input type="email" id="set-mail-receive" placeholder="例: juryo@amazon.co.jp"></div>
+<div class="form-group"><label>✅ レシーブ担当(入庫時に通知)</label><input type="email" id="set-mail-complete" placeholder="例: receive@amazon.co.jp"></div>
+<div class="form-group"><label>📢 全員通知(レシーブ完了時)</label><input type="text" id="set-mail-all" placeholder="例: team@amazon.co.jp, leader@amazon.co.jp"></div>
+<button class="btn btn-primary" onclick="saveMailSettings()">通知先を保存する</button>
+<div id="set-mail-msg" class="alert alert-success hidden" style="margin-top:12px">✅ 通知先を保存しました!</div>
 </div>
 </div>
 
@@ -281,6 +292,11 @@ function loadSettings(){
   let u = getUser();
   document.getElementById('set-name').value = u.name;
   document.getElementById('set-id').value = u.id;
+  // 通知先メール読み込み
+  document.getElementById('set-mail-order').value = localStorage.getItem('rfe_mail_order')||'';
+  document.getElementById('set-mail-receive').value = localStorage.getItem('rfe_mail_receive')||'';
+  document.getElementById('set-mail-complete').value = localStorage.getItem('rfe_mail_complete')||'';
+  document.getElementById('set-mail-all').value = localStorage.getItem('rfe_mail_all')||'';
 }
 function saveUser(){
   let name = document.getElementById('set-name').value.trim();
@@ -292,9 +308,14 @@ function saveUser(){
   updateUserDisplay();
   setTimeout(()=>document.getElementById('set-msg').classList.add('hidden'), 2000);
 }
-function updateUserDisplay(){
-  let u = getUser();
-  document.getElementById('user-display').textContent = u.name ? `${u.name}(${u.id})` : '';
+function saveMailSettings(){
+  localStorage.setItem('rfe_mail_order', document.getElementById('set-mail-order').value.trim());
+  localStorage.setItem('rfe_mail_receive', document.getElementById('set-mail-receive').value.trim());
+  localStorage.setItem('rfe_mail_complete', document.getElementById('set-mail-complete').value.trim());
+  localStorage.setItem('rfe_mail_all', document.getElementById('set-mail-all').value.trim());
+  document.getElementById('set-mail-msg').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('set-mail-msg').classList.add('hidden'), 2000);
+}
 }
 
 // ===== QRスキャン =====
@@ -372,7 +393,8 @@ async function submitAction(){
   document.getElementById('scan-result').classList.add('hidden');
   document.getElementById('scan-success').classList.remove('hidden');
   document.getElementById('s-msg').textContent = currentAction + (saved ? ' 完了!' : ' 完了!(オフライン)');
-}
+  // メール通知ボタン設定
+  showNotifyButton(currentAction, currentItem, qty);
 function cancelAction(){
   document.getElementById('scan-detail').classList.add('hidden');
   document.getElementById('scan-result').classList.remove('hidden');
@@ -380,6 +402,37 @@ function cancelAction(){
 function resetScan(){
   currentItem = null; currentAction = '';
   startScanner();
+}
+
+// ===== 初期化 =====
+// ===== メール通知 =====
+function showNotifyButton(action, item, qty){
+  let btn = document.getElementById('notify-btn');
+  // 操作に応じた通知先を取得
+  let toMap = {
+    '出庫': localStorage.getItem('rfe_mail_order')||'',
+    '補充手配': localStorage.getItem('rfe_mail_receive')||'',
+    '入庫': localStorage.getItem('rfe_mail_complete')||'',
+    'レシーブ完了': localStorage.getItem('rfe_mail_all')||''
+  };
+  let to = toMap[action];
+  if(!to){ btn.style.display='none'; return; }
+  
+  let u = getUser();
+  let subject = encodeURIComponent('[RFE装備品] ' + action + ': ' + item.name + ' ' + item.size);
+  let body = encodeURIComponent(
+    '【RFE装備品 在庫管理 通知】\n\n' +
+    '操作: ' + action + '\n' +
+    '品名: ' + item.name + '\n' +
+    'サイズ: ' + item.size + '\n' +
+    '数量: ' + qty + '\n' +
+    '現在庫: ' + item.stock + ' / 定数 ' + (item.par||'-') + '\n' +
+    '担当: ' + u.name + '(' + u.id + ')\n' +
+    '日時: ' + new Date().toLocaleString('ja-JP') + '\n\n' +
+    '---\nRFE装備品管理アプリより自動生成'
+  );
+  btn.href = 'mailto:' + to + '?subject=' + subject + '&body=' + body;
+  btn.style.display = 'block';
 }
 
 // ===== 初期化 =====
