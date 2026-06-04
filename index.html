@@ -20,7 +20,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .btn:active{transform:scale(.97)}
 .form-group{margin-bottom:14px}
 .form-group label{display:block;margin-bottom:4px;font-weight:600;font-size:14px;color:#333}
-.form-group input,.form-group select{width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;font-size:16px}
+.form-group input{width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;font-size:16px}
 .status{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600}
 .s-ok{background:#d4edda;color:#155724}
 .s-out{background:#fff3cd;color:#856404}
@@ -59,7 +59,6 @@ th{background:#f8f9fa;font-weight:600;color:#666}
 <div class="card" onclick="showPage('scan')" style="cursor:pointer;text-align:center"><div class="big-icon">📷</div><strong>QRスキャン</strong><p style="font-size:11px;color:#666">出庫・入庫</p></div>
 <div class="card" onclick="showPage('list')" style="cursor:pointer;text-align:center"><div class="big-icon">📊</div><strong>在庫一覧</strong><p style="font-size:11px;color:#666">状況確認</p></div>
 <div class="card" onclick="showPage('history')" style="cursor:pointer;text-align:center"><div class="big-icon">📋</div><strong>操作履歴</strong><p style="font-size:11px;color:#666">ログ確認</p></div>
-<div class="card" onclick="showPage('settings')" style="cursor:pointer;text-align:center"><div class="big-icon">⚙️</div><strong>設定</strong><p style="font-size:11px;color:#666">名前・ID・通知先</p></div>
 </div>
 </div>
 </div>
@@ -83,6 +82,8 @@ th{background:#f8f9fa;font-weight:600;color:#666}
 </div>
 <div id="scan-detail" class="card hidden">
 <h3 id="d-title"></h3>
+<div class="form-group"><label>名前</label><input type="text" id="d-name" placeholder="例: 田中太郎"></div>
+<div class="form-group"><label>社員ID</label><input type="text" id="d-id" placeholder="例: A12345"></div>
 <div class="form-group" id="d-qty-group"><label>数量</label><input type="number" id="d-qty" value="1" min="1"></div>
 <div class="form-group hidden" id="d-date-group"><label>納期</label><input type="date" id="d-date"></div>
 <div class="form-group"><label>メモ(任意)</label><input type="text" id="d-note" placeholder="例: 破損のため交換"></div>
@@ -119,25 +120,17 @@ th{background:#f8f9fa;font-weight:600;color:#666}
 </div>
 </div>
 
-<!-- 設定 -->
-<div id="page-settings" class="container hidden">
+<!-- 管理者画面(?admin=1でのみ表示) -->
+<div id="page-admin" class="container hidden">
 <div class="card">
-<h2 style="margin-bottom:12px">⚙️ ユーザー設定</h2>
-<p style="color:#666;margin-bottom:16px;font-size:13px">一度設定すれば次回から自動入力されます。</p>
-<div class="form-group"><label>名前</label><input type="text" id="set-name" placeholder="例: 田中太郎"></div>
-<div class="form-group"><label>社員ID</label><input type="text" id="set-id" placeholder="例: A12345"></div>
-<button class="btn btn-primary" onclick="saveUser()">保存する</button>
-<div id="set-msg" class="alert alert-success hidden" style="margin-top:12px">✅ 保存しました!</div>
-</div>
-<div class="card">
-<h2 style="margin-bottom:12px">📧 通知先メールアドレス</h2>
-<p style="color:#666;margin-bottom:16px;font-size:13px">各操作後にメール通知する担当者のアドレスを設定します。</p>
+<h2 style="margin-bottom:12px">🔒 管理者画面</h2>
+<p style="color:#666;margin-bottom:16px;font-size:13px">通知先メールアドレスを設定します。変更は全端末に反映されます。</p>
 <div class="form-group"><label>🛒 補充手配担当(出庫時に通知)</label><input type="email" id="set-mail-order" placeholder="例: hojyu@amazon.co.jp"></div>
 <div class="form-group"><label>📥 受領担当(手配完了時に通知)</label><input type="email" id="set-mail-receive" placeholder="例: juryo@amazon.co.jp"></div>
 <div class="form-group"><label>✅ レシーブ担当(入庫時に通知)</label><input type="email" id="set-mail-complete" placeholder="例: receive@amazon.co.jp"></div>
 <div class="form-group"><label>📢 全員通知(レシーブ完了時)</label><input type="text" id="set-mail-all" placeholder="例: team@amazon.co.jp, leader@amazon.co.jp"></div>
 <button class="btn btn-primary" onclick="saveMailSettings()">通知先を保存する</button>
-<div id="set-mail-msg" class="alert alert-success hidden" style="margin-top:12px">✅ 通知先を保存しました!</div>
+<div id="set-mail-msg" class="alert alert-success hidden" style="margin-top:12px">✅ 保存しました!</div>
 </div>
 </div>
 
@@ -147,7 +140,7 @@ th{background:#f8f9fa;font-weight:600;color:#666}
 <a href="#" onclick="showPage('scan');return false" id="tab-scan"><div>📷</div>スキャン</a>
 <a href="#" onclick="showPage('list');return false" id="tab-list"><div>📊</div>一覧</a>
 <a href="#" onclick="showPage('history');return false" id="tab-history"><div>📋</div>履歴</a>
-<a href="#" onclick="showPage('settings');return false" id="tab-settings"><div>⚙️</div>設定</a>
+<a href="#" onclick="showPage('admin');return false" id="tab-admin" class="hidden"><div>🔒</div>管理</a>
 </div>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
@@ -216,8 +209,8 @@ var currentAction = '';
 function loadFromCloud(){
   return fetch(BLOB_URL, {headers:{'Accept':'application/json'}})
     .then(function(r){ return r.ok ? r.json() : null; })
-    .then(function(d){ if(d) cloudData = d; else cloudData = {items:JSON.parse(JSON.stringify(DEFAULT_ITEMS)),logs:[]}; })
-    .catch(function(){ cloudData = {items:JSON.parse(JSON.stringify(DEFAULT_ITEMS)),logs:[]}; });
+    .then(function(d){ if(d) cloudData=d; else cloudData={items:JSON.parse(JSON.stringify(DEFAULT_ITEMS)),logs:[],mail_settings:{order:'',receive:'',complete:'',all:''}}; })
+    .catch(function(){ cloudData={items:JSON.parse(JSON.stringify(DEFAULT_ITEMS)),logs:[],mail_settings:{order:'',receive:'',complete:'',all:''}}; });
 }
 function saveToCloud(){
   return fetch(BLOB_URL, {method:'PUT',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(cloudData)})
@@ -228,7 +221,6 @@ function saveToCloud(){
 // ===== データ =====
 function getItems(){ return cloudData ? cloudData.items : DEFAULT_ITEMS; }
 function getLogs(){ return cloudData ? cloudData.logs : []; }
-function getUser(){ return {name:localStorage.getItem('rfe_user_name')||'',id:localStorage.getItem('rfe_user_id')||''}; }
 
 // ===== ページ =====
 function showPage(page){
@@ -241,8 +233,8 @@ function showPage(page){
   if(tab) tab.classList.add('active');
   if(page==='list') renderList();
   if(page==='history') renderHistory();
-  if(page==='settings') loadSettings();
   if(page==='scan') startScanner();
+  if(page==='admin') loadAdmin();
 }
 
 // ===== 一覧 =====
@@ -255,8 +247,7 @@ function renderList(filter){
     var text = (item.name+item.size).toLowerCase();
     if(filter && text.indexOf(filter.toLowerCase())===-1) continue;
     var stockClass = (item.par>0 && item.stock<item.par) ? 'low-stock' : '';
-    var st = getStatusLabel(item);
-    html += '<tr><td>'+item.name+'</td><td>'+item.size+'</td><td class="'+stockClass+'">'+item.stock+'</td><td>'+(item.par||'-')+'</td><td>'+st+'</td></tr>';
+    html += '<tr><td>'+item.name+'</td><td>'+item.size+'</td><td class="'+stockClass+'">'+item.stock+'</td><td>'+(item.par||'-')+'</td><td>'+getStatusLabel(item)+'</td></tr>';
   }
   document.getElementById('items-tbody').innerHTML = html || '<tr><td colspan="5" style="text-align:center;color:#666">データなし</td></tr>';
 }
@@ -271,8 +262,8 @@ function getStatusLabel(item){
 function renderHistory(){
   var logs = getLogs();
   if(!logs.length){ document.getElementById('history-list').innerHTML='<p style="text-align:center;color:#666;padding:20px">まだ履歴はありません</p>'; return; }
-  var html = '<table><thead><tr><th>日時</th><th>操作</th><th>品名</th><th>数量</th><th>担当</th></tr></thead><tbody>';
   var icons = {'出庫':'📤','補充手配':'🛒','入庫':'📥','レシーブ完了':'✅'};
+  var html = '<table><thead><tr><th>日時</th><th>操作</th><th>品名</th><th>数量</th><th>担当</th></tr></thead><tbody>';
   for(var i=0;i<Math.min(logs.length,100);i++){
     var l = logs[i];
     html += '<tr><td style="font-size:11px;white-space:nowrap">'+l.time+'</td><td>'+(icons[l.action]||'')+l.action+'</td><td>'+l.item_name+' '+l.size+'</td><td>'+l.qty+'</td><td>'+l.user+'</td></tr>';
@@ -281,12 +272,8 @@ function renderHistory(){
   document.getElementById('history-list').innerHTML = html;
 }
 
-// ===== 設定 =====
-function loadSettings(){
-  var u = getUser();
-  document.getElementById('set-name').value = u.name;
-  document.getElementById('set-id').value = u.id;
-  // 通知先はクラウドから最新を取得して表示
+// ===== 管理者画面 =====
+function loadAdmin(){
   loadFromCloud().then(function(){
     var ms = (cloudData && cloudData.mail_settings) || {};
     document.getElementById('set-mail-order').value = ms.order||'';
@@ -308,10 +295,6 @@ function saveMailSettings(){
     setTimeout(function(){document.getElementById('set-mail-msg').classList.add('hidden');}, 2000);
   });
 }
-function updateUserDisplay(){
-  var u = getUser();
-  document.getElementById('user-display').textContent = u.name ? u.name+'('+u.id+')' : '';
-}
 
 // ===== QRスキャン =====
 function startScanner(){
@@ -330,11 +313,8 @@ function onScan(code){
   loadFromCloud().then(function(){
     var items = getItems();
     currentItem = null;
-    for(var i=0;i<items.length;i++){ if(items[i].code===code){ currentItem=items[i]; break; } }
-    if(!currentItem){
-      document.getElementById('scan-msg').textContent = '⚠️ 未登録: '+code;
-      return;
-    }
+    for(var i=0;i<items.length;i++){ if(items[i].code===code){currentItem=items[i];break;} }
+    if(!currentItem){ document.getElementById('scan-msg').textContent='⚠️ 未登録: '+code; return; }
     document.getElementById('scan-msg').textContent = '✓ 読み取り完了';
     document.getElementById('r-name').textContent = currentItem.name;
     document.getElementById('r-size').textContent = currentItem.size;
@@ -344,23 +324,28 @@ function onScan(code){
     document.getElementById('scan-result').classList.remove('hidden');
   });
 }
-
 function doAction(action){
-  var u = getUser();
-  if(!u.name||!u.id){ alert('先に設定で名前・IDを登録してください'); showPage('settings'); return; }
   currentAction = action;
-  if(action==='レシーブ完了'){ submitAction(); return; }
   document.getElementById('scan-result').classList.add('hidden');
   document.getElementById('scan-detail').classList.remove('hidden');
-  var titles = {'出庫':'📤 出庫','補充手配':'🛒 補充手配','入庫':'📥 入庫'};
+  var titles = {'出庫':'📤 出庫','補充手配':'🛒 補充手配','入庫':'📥 入庫','レシーブ完了':'✅ レシーブ完了'};
   document.getElementById('d-title').textContent = titles[action];
   document.getElementById('d-date-group').classList.toggle('hidden', action!=='補充手配');
+  document.getElementById('d-qty-group').classList.toggle('hidden', action==='レシーブ完了');
   document.getElementById('d-qty').value = 1;
   document.getElementById('d-note').value = '';
+  // 前回入力した名前・IDを自動表示
+  document.getElementById('d-name').value = localStorage.getItem('rfe_user_name')||'';
+  document.getElementById('d-id').value = localStorage.getItem('rfe_user_id')||'';
 }
-
 function submitAction(){
-  var u = getUser();
+  var name = document.getElementById('d-name').value.trim();
+  var id = document.getElementById('d-id').value.trim();
+  if(!name||!id){ alert('名前とIDを入力してください'); return; }
+  // 名前・IDを記憶
+  localStorage.setItem('rfe_user_name', name);
+  localStorage.setItem('rfe_user_id', id);
+
   var qty = parseInt(document.getElementById('d-qty').value)||1;
   var note = document.getElementById('d-note').value;
   var idx = -1;
@@ -380,7 +365,7 @@ function submitAction(){
   }
   currentItem = cloudData.items[idx];
 
-  var log = {action:currentAction,item_code:currentItem.code,item_name:currentItem.name,size:currentItem.size,qty:qty,user:u.name+'('+u.id+')',note:note,time:new Date().toLocaleString('ja-JP')};
+  var log = {action:currentAction,item_code:currentItem.code,item_name:currentItem.name,size:currentItem.size,qty:qty,user:name+'('+id+')',note:note,time:new Date().toLocaleString('ja-JP')};
   cloudData.logs.unshift(log);
   if(cloudData.logs.length>500) cloudData.logs=cloudData.logs.slice(0,500);
 
@@ -388,51 +373,40 @@ function submitAction(){
     document.getElementById('scan-detail').classList.add('hidden');
     document.getElementById('scan-result').classList.add('hidden');
     document.getElementById('scan-success').classList.remove('hidden');
-    document.getElementById('s-msg').textContent = currentAction + (saved ? ' 完了!' : ' 完了!(オフライン)');
-    showNotifyButton(currentAction, currentItem, qty);
+    document.getElementById('s-msg').textContent = currentAction + (saved?' 完了!':' 完了!(オフライン)');
+    showNotifyButton(currentAction, currentItem, qty, name, id);
   });
 }
 function cancelAction(){
   document.getElementById('scan-detail').classList.add('hidden');
   document.getElementById('scan-result').classList.remove('hidden');
 }
-function resetScan(){
-  currentItem = null; currentAction = '';
-  startScanner();
-}
+function resetScan(){ currentItem=null; currentAction=''; startScanner(); }
 
 // ===== メール通知 =====
-function showNotifyButton(action, item, qty){
+function showNotifyButton(action, item, qty, name, id){
   var btn = document.getElementById('notify-btn');
   var ms = (cloudData && cloudData.mail_settings) || {};
-  var toMap = {
-    '出庫': ms.order||'',
-    '補充手配': ms.receive||'',
-    '入庫': ms.complete||'',
-    'レシーブ完了': ms.all||''
-  };
+  var toMap = {'出庫':ms.order||'','補充手配':ms.receive||'','入庫':ms.complete||'','レシーブ完了':ms.all||''};
   var to = toMap[action];
   if(!to){ btn.style.display='none'; return; }
-  if(!to){ btn.style.display='none'; return; }
-  var u = getUser();
   var subject = encodeURIComponent('[RFE装備品] '+action+': '+item.name+' '+item.size);
   var body = encodeURIComponent(
     '【RFE装備品 在庫管理 通知】\n\n'+
-    '操作: '+action+'\n'+
-    '品名: '+item.name+'\n'+
-    'サイズ: '+item.size+'\n'+
-    '数量: '+qty+'\n'+
-    '現在庫: '+item.stock+' / 定数 '+(item.par||'-')+'\n'+
-    '担当: '+u.name+'('+u.id+')\n'+
-    '日時: '+new Date().toLocaleString('ja-JP')+'\n\n'+
-    '---\nRFE装備品管理アプリより自動生成'
+    '操作: '+action+'\n品名: '+item.name+'\nサイズ: '+item.size+'\n数量: '+qty+
+    '\n現在庫: '+item.stock+' / 定数 '+(item.par||'-')+
+    '\n担当: '+name+'('+id+')'+
+    '\n日時: '+new Date().toLocaleString('ja-JP')+'\n\n---\nRFE装備品管理アプリより'
   );
   btn.href = 'mailto:'+to+'?subject='+subject+'&body='+body;
   btn.style.display = 'block';
 }
 
 // ===== 初期化 =====
-updateUserDisplay();
+// ?admin=1 の場合、管理者タブを表示
+if(window.location.search.indexOf('admin=1')!==-1){
+  document.getElementById('tab-admin').classList.remove('hidden');
+}
 loadFromCloud().then(function(){ renderList(); });
 </script>
 </body>
