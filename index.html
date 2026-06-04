@@ -286,12 +286,14 @@ function loadSettings(){
   var u = getUser();
   document.getElementById('set-name').value = u.name;
   document.getElementById('set-id').value = u.id;
-  // 通知先はクラウドから読み込み
-  var ms = (cloudData && cloudData.mail_settings) || {};
-  document.getElementById('set-mail-order').value = ms.order||'';
-  document.getElementById('set-mail-receive').value = ms.receive||'';
-  document.getElementById('set-mail-complete').value = ms.complete||'';
-  document.getElementById('set-mail-all').value = ms.all||'';
+  // 通知先はクラウドから最新を取得して表示
+  loadFromCloud().then(function(){
+    var ms = (cloudData && cloudData.mail_settings) || {};
+    document.getElementById('set-mail-order').value = ms.order||'';
+    document.getElementById('set-mail-receive').value = ms.receive||'';
+    document.getElementById('set-mail-complete').value = ms.complete||'';
+    document.getElementById('set-mail-all').value = ms.all||'';
+  });
 }
 function saveMailSettings(){
   if(!cloudData) cloudData = {};
