@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>RFE装備品 在庫管理</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f5;padding-bottom:80px}
+.navbar{background:#232f3e;color:#fff;padding:12px 16px;position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center}
+.navbar h1{font-size:16px}
+.container{max-width:600px;margin:0 auto;padding:16px}
+.card{background:#fff;border-radius:12px;padding:20px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.btn{display:inline-block;padding:14px 24px;border-radius:8px;font-size:16px;font-weight:600;text-align:center;cursor:pointer;border:none;width:100%;margin-bottom:8px;transition:all .2s}
+.btn-primary{background:#ff9900;color:#fff}
+.btn-danger{background:#dc3545;color:#fff}
+.btn-success{background:#28a745;color:#fff}
+.btn-info{background:#17a2b8;color:#fff}
+.btn-secondary{background:#6c757d;color:#fff}
+.btn:active{transform:scale(.97)}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;margin-bottom:4px;font-weight:600;font-size:14px;color:#333}
+.form-group input,.form-group select{width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;font-size:16px}
+.status{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600}
+.s-ok{background:#d4edda;color:#155724}
+.s-out{background:#fff3cd;color:#856404}
+.s-order{background:#cce5ff;color:#004085}
+.s-wait{background:#e2d9f3;color:#4a148c}
+.s-empty{background:#f8d7da;color:#721c24}
+.s-done{background:#d1ecf1;color:#0c5460}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:8px 6px;text-align:left;border-bottom:1px solid #eee}
+th{background:#f8f9fa;font-weight:600;color:#666;position:sticky;top:52px}
+.tab-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #eee;display:flex;z-index:100}
+.tab-bar a{flex:1;text-align:center;padding:10px 4px;text-decoration:none;color:#666;font-size:11px}
+.tab-bar a.active{color:#ff9900}
+.tab-bar a div{font-size:20px;margin-bottom:2px}
+.hidden{display:none}
+.big-icon{font-size:48px;text-align:center;margin-bottom:12px}
+.alert{padding:12px;border-radius:8px;margin-bottom:12px;text-align:center}
+.alert-success{background:#d4edda;color:#155724}
+.search-box{width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:12px}
+.low-stock{color:#dc3545;font-weight:bold}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+<h1>📦 RFE装備品</h1>
+<span id="user-display" style="font-size:12px;color:#aaa"></span>
+</nav>
+
+<!-- ===== ホーム ===== -->
+<div id="page-home" class="container">
+<div style="text-align:center;padding:20px 0">
+<h2 style="margin-bottom:4px">RFE装備品 在庫管理</h2>
+<p style="color:#666;margin-bottom:24px;font-size:14px">QRスキャンでワンクリック操作</p>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<div class="card" onclick="showPage('scan')" style="cursor:pointer;text-align:center"><div class="big-icon">📷</div><strong>QRスキャン</strong><p style="font-size:11px;color:#666">出庫・入庫</p></div>
+<div class="card" onclick="showPage('list')" style="cursor:pointer;text-align:center"><div class="big-icon">📊</div><strong>在庫一覧</strong><p style="font-size:11px;color:#666">状況確認</p></div>
+<div class="card" onclick="showPage('history')" style="cursor:pointer;text-align:center"><div class="big-icon">📋</div><strong>操作履歴</strong><p style="font-size:11px;color:#666">ログ確認</p></div>
+<div class="card" onclick="showPage('settings')" style="cursor:pointer;text-align:center"><div class="big-icon">⚙️</div><strong>設定</strong><p style="font-size:11px;color:#666">名前・ID</p></div>
+</div>
+</div>
+</div>
+
+<!-- ===== QRスキャン ===== -->
+<div id="page-scan" class="container hidden">
+<div class="card">
+<h2 style="margin-bottom:12px">📷 QRコードスキャン</h2>
+<div id="reader" style="width:100%"></div>
+<p id="scan-msg" style="text-align:center;margin-top:8px;color:#666;font-size:13px">カメラ起動中...</p>
+</div>
+<div id="scan-result" class="card hidden">
+<h3 id="r-name"></h3>
+<p style="margin:8px 0"><strong>サイズ:</strong> <span id="r-size"></span> | <strong>在庫:</strong> <span id="r-stock"></span> / 定数 <span id="r-par"></span></p>
+<p><strong>ステータス:</strong> <span id="r-status"></span></p>
+<hr style="margin:16px 0">
+<button class="btn btn-danger" onclick="doAction('出庫')">📤 出庫する</button>
+<button class="btn btn-primary" onclick="doAction('補充手配')">🛒 補充手配</button>
+<button class="btn btn-success" onclick="doAction('入庫')">📥 入庫する</button>
+<button class="btn btn-info" onclick="doAction('レシーブ完了')">✅ レシーブ完了</button>
+</div>
+<div id="scan-detail" class="card hidden">
+<h3 id="d-title"></h3>
+<div class="form-group" id="d-qty-group"><label>数量</label><input type="number" id="d-qty" value="1" min="1"></div>
+<div class="form-group hidden" id="d-date-group"><label>納期</label><input type="date" id="d-date"></div>
+<div class="form-group"><label>メモ(任意)</label><input type="text" id="d-note" placeholder="例: 破損のため交換"></div>
+<button class="btn btn-primary" onclick="submitAction()">確定する</button>
+<button class="btn btn-secondary" onclick="cancelAction()">キャンセル</button>
+</div>
+<div id="scan-success" class="card hidden" style="text-align:center">
+<div class="big-icon">✅</div>
+<h3 id="s-msg">完了!</h3>
+<button class="btn btn-primary" style="margin-top:12px" onclick="resetScan()">次のスキャンへ</button>
+</div>
+</div>
+
+<!-- ===== 在庫一覧 ===== -->
+<div id="page-list" class="container hidden">
+<div class="card">
+<h2 style="margin-bottom:12px">📊 在庫一覧</h2>
+<input class="search-box" type="text" placeholder="🔍 品名・サイズで検索..." oninput="filterList(this.value)">
+<div style="overflow-x:auto">
+<table>
+<thead><tr><th>品名</th><th>サイズ</th><th>在庫</th><th>定数</th><th>状態</th></tr></thead>
+<tbody id="items-tbody"></tbody>
+</table>
+</div>
+</div>
+</div>
+
+<!-- ===== 操作履歴 ===== -->
+<div id="page-history" class="container hidden">
+<div class="card">
+<h2 style="margin-bottom:12px">📋 操作履歴</h2>
+<div id="history-list"></div>
+</div>
+</div>
+
+<!-- ===== 設定 ===== -->
+<div id="page-settings" class="container hidden">
+<div class="card">
+<h2 style="margin-bottom:12px">⚙️ ユーザー設定</h2>
+<p style="color:#666;margin-bottom:16px;font-size:13px">一度設定すれば次回から自動入力されます。</p>
+<div class="form-group"><label>名前</label><input type="text" id="set-name" placeholder="例: 田中太郎"></div>
+<div class="form-group"><label>社員ID</label><input type="text" id="set-id" placeholder="例: A12345"></div>
+<button class="btn btn-primary" onclick="saveUser()">保存する</button>
+<div id="set-msg" class="alert alert-success hidden" style="margin-top:12px">✅ 保存しました!</div>
+</div>
+</div>
+
+<!-- タブバー -->
+<div class="tab-bar">
+<a href="#" onclick="showPage('home')" id="tab-home" class="active"><div>🏠</div>ホーム</a>
+<a href="#" onclick="showPage('scan')" id="tab-scan"><div>📷</div>スキャン</a>
+<a href="#" onclick="showPage('list')" id="tab-list"><div>📊</div>一覧</a>
+<a href="#" onclick="showPage('history')" id="tab-history"><div>📋</div>履歴</a>
+<a href="#" onclick="showPage('settings')" id="tab-settings"><div>⚙️</div>設定</a>
+</div>
+
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script>
+// ===== データ =====
+const DEFAULT_ITEMS = [
+{"code":"RFE-001","name":"冬用ジャケット","size":"S","par":3,"stock":3},
+{"code":"RFE-002","name":"冬用ジャケット","size":"M","par":3,"stock":6},
+{"code":"RFE-003","name":"冬用ジャケット","size":"L","par":3,"stock":1},
+{"code":"RFE-004","name":"冬用ジャケット","size":"LL","par":3,"stock":0},
+{"code":"RFE-005","name":"冬用ジャケット","size":"3L","par":3,"stock":2},
+{"code":"RFE-006","name":"空調服","size":"S","par":3,"stock":3},
+{"code":"RFE-007","name":"空調服","size":"M","par":3,"stock":6},
+{"code":"RFE-008","name":"空調服","size":"L","par":3,"stock":4},
+{"code":"RFE-009","name":"空調服","size":"LL","par":3,"stock":3},
+{"code":"RFE-010","name":"空調服","size":"EL","par":3,"stock":3},
+{"code":"RFE-011","name":"空調服_スターターキット","size":"-","par":0,"stock":6},
+{"code":"RFE-012","name":"空調服_バッテリーセット","size":"-","par":0,"stock":6},
+{"code":"RFE-013","name":"空調服_ファン・ケーブルセット","size":"-","par":0,"stock":1},
+{"code":"RFE-014","name":"空調服_ファンセット(ケーブル無)","size":"-","par":0,"stock":8},
+{"code":"RFE-015","name":"空調服_ファン用ケーブル","size":"-","par":0,"stock":4},
+{"code":"RFE-016","name":"空調服_その他","size":"-","par":0,"stock":1},
+{"code":"RFE-017","name":"作業用ズボン_女性用","size":"S","par":3,"stock":4},
+{"code":"RFE-018","name":"作業用ズボン_女性用","size":"M","par":3,"stock":6},
+{"code":"RFE-019","name":"作業用ズボン_女性用","size":"L","par":3,"stock":4},
+{"code":"RFE-020","name":"作業用ズボン_女性用","size":"LL","par":3,"stock":4},
+{"code":"RFE-021","name":"作業用ズボン_男性用","size":"76","par":3,"stock":3},
+{"code":"RFE-022","name":"作業用ズボン_男性用","size":"82","par":3,"stock":2},
+{"code":"RFE-023","name":"作業用ズボン_男性用","size":"85","par":3,"stock":3},
+{"code":"RFE-024","name":"作業用ズボン_男性用","size":"88","par":3,"stock":3},
+{"code":"RFE-025","name":"作業用ズボン_男性用","size":"91","par":3,"stock":4},
+{"code":"RFE-026","name":"作業用ズボン_男性用","size":"96","par":3,"stock":4},
+{"code":"RFE-027","name":"作業用ズボン_男性用","size":"101","par":3,"stock":4},
+{"code":"RFE-028","name":"長袖ポロシャツ","size":"M","par":4,"stock":8},
+{"code":"RFE-029","name":"長袖ポロシャツ","size":"L","par":4,"stock":9},
+{"code":"RFE-030","name":"長袖ポロシャツ","size":"LL","par":4,"stock":10},
+{"code":"RFE-031","name":"折り畳みヘルメット","size":"-","par":2,"stock":1},
+{"code":"RFE-032","name":"リフレクター付き安全バンド","size":"-","par":2,"stock":0},
+{"code":"RFE-033","name":"冬用ベスト(電熱ベスト)","size":"M","par":2,"stock":2},
+{"code":"RFE-034","name":"冬用ベスト(電熱ベスト)","size":"L","par":2,"stock":1},
+{"code":"RFE-035","name":"冬用ベスト(電熱ベスト)","size":"LL","par":2,"stock":3},
+{"code":"RFE-036","name":"安全靴","size":"22.5","par":0,"stock":1},
+{"code":"RFE-037","name":"安全靴","size":"23.0","par":0,"stock":1},
+{"code":"RFE-038","name":"安全靴","size":"23.5","par":2,"stock":0},
+{"code":"RFE-039","name":"安全靴","size":"24.0","par":1,"stock":0},
+{"code":"RFE-040","name":"安全靴","size":"24.5","par":1,"stock":0},
+{"code":"RFE-041","name":"安全靴","size":"25.0","par":0,"stock":0},
+{"code":"RFE-042","name":"安全靴(紺)","size":"25.0","par":0,"stock":1},
+{"code":"RFE-043","name":"安全靴","size":"25.5","par":0,"stock":1},
+{"code":"RFE-044","name":"安全靴","size":"26.0","par":0,"stock":2},
+{"code":"RFE-045","name":"安全靴","size":"26.5","par":3,"stock":0},
+{"code":"RFE-046","name":"安全靴","size":"27.0","par":0,"stock":1},
+{"code":"RFE-047","name":"安全靴(黒)","size":"27.5","par":0,"stock":1},
+{"code":"RFE-048","name":"安全靴","size":"27.5","par":0,"stock":1},
+{"code":"RFE-049","name":"安全靴","size":"28.0","par":0,"stock":2},
+{"code":"RFE-050","name":"安全靴","size":"29.0","par":0,"stock":1}
+];
+
+// ===== Storage =====
+function getItems(){
+  let d = localStorage.getItem('rfe_items');
+  if(!d){ localStorage.setItem('rfe_items', JSON.stringify(DEFAULT_ITEMS)); return DEFAULT_ITEMS; }
+  return JSON.parse(d);
+}
+function saveItems(items){ localStorage.setItem('rfe_items', JSON.stringify(items)); }
+function getLogs(){
+  let d = localStorage.getItem('rfe_logs');
+  return d ? JSON.parse(d) : [];
+}
+function addLog(log){
+  let logs = getLogs();
+  log.time = new Date().toLocaleString('ja-JP');
+  logs.unshift(log);
+  if(logs.length > 500) logs = logs.slice(0, 500);
+  localStorage.setItem('rfe_logs', JSON.stringify(logs));
+}
+function getUser(){
+  return { name: localStorage.getItem('rfe_user_name')||'', id: localStorage.getItem('rfe_user_id')||'' };
+}
+
+// ===== ページ切替 =====
+function showPage(page){
+  document.querySelectorAll('[id^="page-"]').forEach(p=>p.classList.add('hidden'));
+  document.getElementById('page-'+page).classList.remove('hidden');
+  document.querySelectorAll('.tab-bar a').forEach(a=>a.classList.remove('active'));
+  let tab = document.getElementById('tab-'+page);
+  if(tab) tab.classList.add('active');
+  if(page==='list') renderList();
+  if(page==='history') renderHistory();
+  if(page==='settings') loadSettings();
+  if(page==='scan') startScanner();
+}
+
+// ===== 在庫一覧 =====
+function renderList(filter=''){
+  let items = getItems();
+  let html = '';
+  items.forEach(item=>{
+    let text = (item.name+item.size).toLowerCase();
+    if(filter && !text.includes(filter.toLowerCase())) return;
+    let stockClass = (item.par>0 && item.stock<item.par) ? 'low-stock' : '';
+    let st = getStatusLabel(item);
+    html += `<tr><td>${item.name}</td><td>${item.size}</td><td class="${stockClass}">${item.stock}</td><td>${item.par||'-'}</td><td>${st}</td></tr>`;
+  });
+  document.getElementById('items-tbody').innerHTML = html || '<tr><td colspan="5" style="text-align:center;color:#666">該当なし</td></tr>';
+}
+function filterList(q){ renderList(q); }
+function getStatusLabel(item){
+  let s = item.status || (item.stock>0?'在庫あり':'在庫なし');
+  let cls = {'在庫あり':'s-ok','出庫済':'s-out','手配中':'s-order','入庫待ち':'s-wait','在庫なし':'s-empty','レシーブ完了':'s-done'}[s]||'s-ok';
+  return `<span class="status ${cls}">${s}</span>`;
+}
+
+// ===== 操作履歴 =====
+function renderHistory(){
+  let logs = getLogs();
+  if(!logs.length){ document.getElementById('history-list').innerHTML='<p style="text-align:center;color:#666;padding:20px">まだ履歴はありません</p>'; return; }
+  let html = '<table><thead><tr><th>日時</th><th>操作</th><th>品名</th><th>数量</th><th>担当</th></tr></thead><tbody>';
+  logs.slice(0,100).forEach(l=>{
+    let icon = {'出庫':'📤','補充手配':'🛒','入庫':'📥','レシーブ完了':'✅'}[l.action]||'';
+    html += `<tr><td style="font-size:11px;white-space:nowrap">${l.time}</td><td>${icon}${l.action}</td><td>${l.item_name} ${l.size}</td><td>${l.qty}</td><td>${l.user}</td></tr>`;
+  });
+  html += '</tbody></table>';
+  document.getElementById('history-list').innerHTML = html;
+}
+
+// ===== 設定 =====
+function loadSettings(){
+  let u = getUser();
+  document.getElementById('set-name').value = u.name;
+  document.getElementById('set-id').value = u.id;
+}
+function saveUser(){
+  let name = document.getElementById('set-name').value.trim();
+  let id = document.getElementById('set-id').value.trim();
+  if(!name||!id){ alert('名前とIDを両方入力してください'); return; }
+  localStorage.setItem('rfe_user_name', name);
+  localStorage.setItem('rfe_user_id', id);
+  document.getElementById('set-msg').classList.remove('hidden');
+  updateUserDisplay();
+  setTimeout(()=>document.getElementById('set-msg').classList.add('hidden'), 2000);
+}
+function updateUserDisplay(){
+  let u = getUser();
+  document.getElementById('user-display').textContent = u.name ? `${u.name}(${u.id})` : '';
+}
+
+// ===== QRスキャン =====
+let scanner = null;
+let currentItem = null;
+let currentAction = '';
+
+function startScanner(){
+  document.getElementById('scan-result').classList.add('hidden');
+  document.getElementById('scan-detail').classList.add('hidden');
+  document.getElementById('scan-success').classList.add('hidden');
+  document.getElementById('scan-msg').textContent = 'カメラ起動中...';
+  if(scanner){ try{scanner.clear();}catch(e){} }
+  setTimeout(()=>{
+    scanner = new Html5QrcodeScanner("reader",{fps:10,qrbox:{width:220,height:220}});
+    scanner.render(onScan, ()=>{});
+  }, 300);
+}
+function onScan(code){
+  if(scanner) try{scanner.clear();}catch(e){}
+  let items = getItems();
+  currentItem = items.find(i=>i.code===code);
+  if(!currentItem){
+    document.getElementById('scan-msg').textContent = '⚠️ 未登録: '+code;
+    return;
+  }
+  document.getElementById('scan-msg').textContent = '✓ 読み取り完了';
+  document.getElementById('r-name').textContent = currentItem.name;
+  document.getElementById('r-size').textContent = currentItem.size;
+  document.getElementById('r-stock').textContent = currentItem.stock;
+  document.getElementById('r-par').textContent = currentItem.par||'-';
+  document.getElementById('r-status').innerHTML = getStatusLabel(currentItem);
+  document.getElementById('scan-result').classList.remove('hidden');
+}
+
+function doAction(action){
+  let u = getUser();
+  if(!u.name||!u.id){ alert('先に設定で名前・IDを登録してください'); showPage('settings'); return; }
+  currentAction = action;
+  if(action==='レシーブ完了'){
+    submitAction(); return;
+  }
+  document.getElementById('scan-result').classList.add('hidden');
+  document.getElementById('scan-detail').classList.remove('hidden');
+  document.getElementById('d-title').textContent = {'出庫':'📤 出庫','補充手配':'🛒 補充手配','入庫':'📥 入庫'}[action];
+  document.getElementById('d-date-group').classList.toggle('hidden', action!=='補充手配');
+  document.getElementById('d-qty').value = 1;
+  document.getElementById('d-note').value = '';
+}
+
+function submitAction(){
+  let u = getUser();
+  let qty = parseInt(document.getElementById('d-qty').value)||1;
+  let note = document.getElementById('d-note').value;
+  let items = getItems();
+  let idx = items.findIndex(i=>i.code===currentItem.code);
+
+  if(currentAction==='出庫'){
+    items[idx].stock = Math.max(0, items[idx].stock - qty);
+    items[idx].status = items[idx].stock>0?'在庫あり':'出庫済';
+  } else if(currentAction==='補充手配'){
+    items[idx].status = '手配中';
+  } else if(currentAction==='入庫'){
+    items[idx].stock += qty;
+    items[idx].status = '入庫待ち';
+  } else if(currentAction==='レシーブ完了'){
+    items[idx].status = '在庫あり';
+    qty = 0;
+  }
+  saveItems(items);
+  addLog({action:currentAction, item_code:currentItem.code, item_name:currentItem.name, size:currentItem.size, qty:qty, user:u.name+'('+u.id+')', note:note});
+
+  document.getElementById('scan-detail').classList.add('hidden');
+  document.getElementById('scan-result').classList.add('hidden');
+  document.getElementById('scan-success').classList.remove('hidden');
+  document.getElementById('s-msg').textContent = currentAction + ' 完了!';
+}
+function cancelAction(){
+  document.getElementById('scan-detail').classList.add('hidden');
+  document.getElementById('scan-result').classList.remove('hidden');
+}
+function resetScan(){
+  currentItem = null;
+  currentAction = '';
+  startScanner();
+}
+
+// ===== 初期化 =====
+updateUserDisplay();
+getItems(); // 初期データ投入
+</script>
+</body>
+</html>
