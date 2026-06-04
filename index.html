@@ -65,6 +65,7 @@ th{background:#f8f9fa;font-weight:600;color:#666;position:sticky;top:52px}
 </div>
 
 <!-- ===== QRスキャン ===== -->
+<!-- ===== QRスキャン ===== -->
 <div id="page-scan" class="container hidden">
 <div class="card">
 <h2 style="margin-bottom:12px">📷 QRコードスキャン</h2>
@@ -92,15 +93,15 @@ th{background:#f8f9fa;font-weight:600;color:#666;position:sticky;top:52px}
 <div id="scan-success" class="card hidden" style="text-align:center">
 <div class="big-icon">✅</div>
 <h3 id="s-msg">完了!</h3>
-<button class="btn btn-primary" style="margin-top:12px" onclick="resetScan()">次のスキャンへ</button>
-</div>
-</div>
-<div id="scan-success" class="card hidden" style="text-align:center">
-<div class="big-icon">✅</div>
-<h3 id="s-msg">完了!</h3>
 <a id="notify-btn" class="btn btn-primary" style="margin-top:12px;display:none;text-decoration:none" href="#">📧 関係者に通知する</a>
 <button class="btn btn-secondary" style="margin-top:8px" onclick="resetScan()">次のスキャンへ</button>
 </div>
+</div>
+
+<!-- ===== 在庫一覧 ===== -->
+<div id="page-list" class="container hidden">
+<div class="card">
+<h2 style="margin-bottom:12px">📊 在庫一覧</h2>
 <input class="search-box" type="text" placeholder="🔍 品名・サイズで検索..." oninput="filterList(this.value)">
 <div style="overflow-x:auto">
 <table>
