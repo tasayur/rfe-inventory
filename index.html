@@ -166,41 +166,87 @@ const DEFAULT_ITEMS = [
 <script>
 // ===== クラウドDB設定 =====
 const BLOB_URL = 'https://jsonblob.com/api/jsonBlob/019e9049-93f9-73a1-b4c1-4557ef24db88';
+
+// デフォルトデータ(クラウドが読めない場合のフォールバック)
+const DEFAULT_ITEMS = [
+{"code":"RFE-001","name":"冬用ジャケット","size":"S","par":3,"stock":3,"status":"在庫あり"},
+{"code":"RFE-002","name":"冬用ジャケット","size":"M","par":3,"stock":6,"status":"在庫あり"},
+{"code":"RFE-003","name":"冬用ジャケット","size":"L","par":3,"stock":1,"status":"在庫あり"},
+{"code":"RFE-004","name":"冬用ジャケット","size":"LL","par":3,"stock":0,"status":"在庫なし"},
+{"code":"RFE-005","name":"冬用ジャケット","size":"3L","par":3,"stock":2,"status":"在庫あり"},
+{"code":"RFE-006","name":"空調服","size":"S","par":3,"stock":3,"status":"在庫あり"},
+{"code":"RFE-007","name":"空調服","size":"M","par":3,"stock":6,"status":"在庫あり"},
+{"code":"RFE-008","name":"空調服","size":"L","par":3,"stock":4,"status":"在庫あり"},
+{"code":"RFE-009","name":"空調服","size":"LL","par":3,"stock":3,"status":"在庫あり"},
+{"code":"RFE-010","name":"空調服","size":"EL","par":3,"stock":3,"status":"在庫あり"},
+{"code":"RFE-011","name":"空調服_スターターキット","size":"-","par":0,"stock":6,"status":"在庫あり"},
+{"code":"RFE-012","name":"空調服_バッテリーセット","size":"-","par":0,"stock":6,"status":"在庫あり"},
+{"code":"RFE-013","name":"空調服_ファン・ケーブルセット","size":"-","par":0,"stock":1,"status":"在庫あり"},
+{"code":"RFE-014","name":"空調服_ファンセット(ケーブル無)","size":"-","par":0,"stock":8,"status":"在庫あり"},
+{"code":"RFE-015","name":"空調服_ファン用ケーブル","size":"-","par":0,"stock":4,"status":"在庫あり"},
+{"code":"RFE-016","name":"空調服_その他","size":"-","par":0,"stock":1,"status":"在庫あり"},
+{"code":"RFE-017","name":"作業用ズボン_女性用","size":"S","par":3,"stock":4,"status":"在庫あり"},
+{"code":"RFE-018","name":"作業用ズボン_女性用","size":"M","par":3,"stock":6,"status":"在庫あり"},
+{"code":"RFE-019","name":"作業用ズボン_女性用","size":"L","par":3,"stock":4,"status":"在庫あり"},
+{"code":"RFE-020","name":"作業用ズボン_女性用","size":"LL","par":3,"stock":4,"status":"在庫あり"},
+{"code":"RFE-021","name":"作業用ズボン_男性用","size":"76","par":3,"stock":3,"status":"在庫あり"},
+{"code":"RFE-022","name":"作業用ズボン_男性用","size":"82","par":3,"stock":2,"status":"在庫あり"},
+{"code":"RFE-023","name":"作業用ズボン_男性用","size":"85","par":3,"stock":3,"status":"在庫あり"},
+{"code":"RFE-024","name":"作業用ズボン_男性用","size":"88","par":3,"stock":3,"status":"在庫あり"},
+{"code":"RFE-025","name":"作業用ズボン_男性用","size":"91","par":3,"stock":4,"status":"在庫あり"},
+{"code":"RFE-026","name":"作業用ズボン_男性用","size":"96","par":3,"stock":4,"status":"在庫あり"},
+{"code":"RFE-027","name":"作業用ズボン_男性用","size":"101","par":3,"stock":4,"status":"在庫あり"},
+{"code":"RFE-028","name":"長袖ポロシャツ","size":"M","par":4,"stock":8,"status":"在庫あり"},
+{"code":"RFE-029","name":"長袖ポロシャツ","size":"L","par":4,"stock":9,"status":"在庫あり"},
+{"code":"RFE-030","name":"長袖ポロシャツ","size":"LL","par":4,"stock":10,"status":"在庫あり"},
+{"code":"RFE-031","name":"折り畳みヘルメット","size":"-","par":2,"stock":1,"status":"在庫あり"},
+{"code":"RFE-032","name":"リフレクター付き安全バンド","size":"-","par":2,"stock":0,"status":"在庫なし"},
+{"code":"RFE-033","name":"冬用ベスト(電熱ベスト)","size":"M","par":2,"stock":2,"status":"在庫あり"},
+{"code":"RFE-034","name":"冬用ベスト(電熱ベスト)","size":"L","par":2,"stock":1,"status":"在庫あり"},
+{"code":"RFE-035","name":"冬用ベスト(電熱ベスト)","size":"LL","par":2,"stock":3,"status":"在庫あり"},
+{"code":"RFE-036","name":"安全靴","size":"22.5","par":1,"stock":1,"status":"在庫あり"},
+{"code":"RFE-037","name":"安全靴","size":"23","par":1,"stock":1,"status":"在庫あり"},
+{"code":"RFE-038","name":"安全靴","size":"23.5","par":2,"stock":0,"status":"在庫なし"},
+{"code":"RFE-039","name":"安全靴","size":"24","par":1,"stock":0,"status":"在庫なし"},
+{"code":"RFE-040","name":"安全靴","size":"24.5","par":1,"stock":0,"status":"在庫なし"},
+{"code":"RFE-041","name":"安全靴","size":"25","par":1,"stock":0,"status":"在庫なし"},
+{"code":"RFE-042","name":"安全靴(紺)","size":"25","par":1,"stock":1,"status":"在庫あり"},
+{"code":"RFE-043","name":"安全靴","size":"25.5","par":1,"stock":1,"status":"在庫あり"},
+{"code":"RFE-044","name":"安全靴","size":"26","par":1,"stock":2,"status":"在庫あり"},
+{"code":"RFE-045","name":"安全靴","size":"26.5","par":3,"stock":0,"status":"在庫なし"},
+{"code":"RFE-046","name":"安全靴","size":"27","par":1,"stock":1,"status":"在庫あり"},
+{"code":"RFE-047","name":"安全靴(黒)","size":"27.5","par":1,"stock":1,"status":"在庫あり"},
+{"code":"RFE-048","name":"安全靴","size":"27.5","par":1,"stock":1,"status":"在庫あり"},
+{"code":"RFE-049","name":"安全靴","size":"28","par":1,"stock":2,"status":"在庫あり"},
+{"code":"RFE-050","name":"安全靴","size":"29","par":1,"stock":1,"status":"在庫あり"}
+];
+
 let cloudData = null;
-let syncStatus = 'loading';
 
 // ===== クラウド読み込み =====
 async function loadFromCloud(){
   try {
-    syncStatus = 'syncing';
     let r = await fetch(BLOB_URL, {headers:{'Accept':'application/json'}});
-    if(r.ok){
-      cloudData = await r.json();
-      syncStatus = 'synced';
-      return true;
-    }
-  } catch(e){ console.error('Cloud load error:', e); }
-  syncStatus = 'offline';
+    if(r.ok){ cloudData = await r.json(); return true; }
+  } catch(e){ console.error('Cloud error:', e); }
+  // フォールバック: デフォルトデータ使用
+  cloudData = {items: JSON.parse(JSON.stringify(DEFAULT_ITEMS)), logs: []};
   return false;
 }
 
 // ===== クラウド保存 =====
 async function saveToCloud(){
   try {
-    syncStatus = 'syncing';
     let r = await fetch(BLOB_URL, {
-      method: 'PUT',
-      headers: {'Content-Type':'application/json','Accept':'application/json'},
+      method:'PUT', headers:{'Content-Type':'application/json','Accept':'application/json'},
       body: JSON.stringify(cloudData)
     });
-    if(r.ok){ syncStatus = 'synced'; return true; }
-  } catch(e){ console.error('Cloud save error:', e); }
-  syncStatus = 'error';
-  return false;
+    return r.ok;
+  } catch(e){ return false; }
 }
 
 // ===== データアクセス =====
-function getItems(){ return cloudData ? cloudData.items : []; }
+function getItems(){ return cloudData ? cloudData.items : DEFAULT_ITEMS; }
 function getLogs(){ return cloudData ? cloudData.logs : []; }
 function getUser(){
   return { name: localStorage.getItem('rfe_user_name')||'', id: localStorage.getItem('rfe_user_id')||'' };
@@ -230,7 +276,7 @@ function renderList(filter=''){
     let st = getStatusLabel(item);
     html += `<tr><td>${item.name}</td><td>${item.size}</td><td class="${stockClass}">${item.stock}</td><td>${item.par||'-'}</td><td>${st}</td></tr>`;
   });
-  document.getElementById('items-tbody').innerHTML = html || '<tr><td colspan="5" style="text-align:center;color:#666">読み込み中...</td></tr>';
+  document.getElementById('items-tbody').innerHTML = html || '<tr><td colspan="5" style="text-align:center;color:#666">データなし</td></tr>';
 }
 function filterList(q){ renderList(q); }
 function getStatusLabel(item){
@@ -291,7 +337,6 @@ function startScanner(){
 }
 async function onScan(code){
   if(scanner) try{scanner.clear();}catch(e){}
-  // 最新データを取得してからスキャン結果表示
   await loadFromCloud();
   let items = getItems();
   currentItem = items.find(i=>i.code===code);
@@ -312,9 +357,7 @@ function doAction(action){
   let u = getUser();
   if(!u.name||!u.id){ alert('先に設定で名前・IDを登録してください'); showPage('settings'); return; }
   currentAction = action;
-  if(action==='レシーブ完了'){
-    submitAction(); return;
-  }
+  if(action==='レシーブ完了'){ submitAction(); return; }
   document.getElementById('scan-result').classList.add('hidden');
   document.getElementById('scan-detail').classList.remove('hidden');
   document.getElementById('d-title').textContent = {'出庫':'📤 出庫','補充手配':'🛒 補充手配','入庫':'📥 入庫'}[action];
@@ -342,36 +385,30 @@ async function submitAction(){
     qty = 0;
   }
 
-  // ログ追加
   let log = {action:currentAction, item_code:currentItem.code, item_name:currentItem.name, size:currentItem.size, qty:qty, user:u.name+'('+u.id+')', note:note, time:new Date().toLocaleString('ja-JP')};
   cloudData.logs.unshift(log);
   if(cloudData.logs.length > 500) cloudData.logs = cloudData.logs.slice(0,500);
 
-  // クラウドに保存
   let saved = await saveToCloud();
-
   document.getElementById('scan-detail').classList.add('hidden');
   document.getElementById('scan-result').classList.add('hidden');
   document.getElementById('scan-success').classList.remove('hidden');
-  document.getElementById('s-msg').textContent = currentAction + (saved ? ' 完了!' : ' 完了! (同期待ち)');
+  document.getElementById('s-msg').textContent = currentAction + (saved ? ' 完了!' : ' 完了!(オフライン)');
 }
 function cancelAction(){
   document.getElementById('scan-detail').classList.add('hidden');
   document.getElementById('scan-result').classList.remove('hidden');
 }
 function resetScan(){
-  currentItem = null;
-  currentAction = '';
+  currentItem = null; currentAction = '';
   startScanner();
 }
 
 // ===== 初期化 =====
 async function init(){
   updateUserDisplay();
-  let loaded = await loadFromCloud();
-  if(!loaded){
-    document.querySelector('.navbar h1').textContent = '📦 RFE装備品 (オフライン)';
-  }
+  await loadFromCloud();
+  renderList();
 }
 init();
 </script>
