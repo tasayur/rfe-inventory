@@ -306,6 +306,7 @@ function saveMailSettings(){
     setTimeout(function(){document.getElementById('set-mail-msg').classList.add('hidden');}, 2000);
   });
 }
+function updateUserDisplay(){
   var u = getUser();
   document.getElementById('user-display').textContent = u.name ? u.name+'('+u.id+')' : '';
 }
