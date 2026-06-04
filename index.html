@@ -286,30 +286,26 @@ function loadSettings(){
   var u = getUser();
   document.getElementById('set-name').value = u.name;
   document.getElementById('set-id').value = u.id;
-  document.getElementById('set-mail-order').value = localStorage.getItem('rfe_mail_order')||'';
-  document.getElementById('set-mail-receive').value = localStorage.getItem('rfe_mail_receive')||'';
-  document.getElementById('set-mail-complete').value = localStorage.getItem('rfe_mail_complete')||'';
-  document.getElementById('set-mail-all').value = localStorage.getItem('rfe_mail_all')||'';
-}
-function saveUser(){
-  var name = document.getElementById('set-name').value.trim();
-  var id = document.getElementById('set-id').value.trim();
-  if(!name||!id){ alert('名前とIDを両方入力してください'); return; }
-  localStorage.setItem('rfe_user_name', name);
-  localStorage.setItem('rfe_user_id', id);
-  document.getElementById('set-msg').classList.remove('hidden');
-  updateUserDisplay();
-  setTimeout(function(){document.getElementById('set-msg').classList.add('hidden');}, 2000);
+  // 通知先はクラウドから読み込み
+  var ms = (cloudData && cloudData.mail_settings) || {};
+  document.getElementById('set-mail-order').value = ms.order||'';
+  document.getElementById('set-mail-receive').value = ms.receive||'';
+  document.getElementById('set-mail-complete').value = ms.complete||'';
+  document.getElementById('set-mail-all').value = ms.all||'';
 }
 function saveMailSettings(){
-  localStorage.setItem('rfe_mail_order', document.getElementById('set-mail-order').value.trim());
-  localStorage.setItem('rfe_mail_receive', document.getElementById('set-mail-receive').value.trim());
-  localStorage.setItem('rfe_mail_complete', document.getElementById('set-mail-complete').value.trim());
-  localStorage.setItem('rfe_mail_all', document.getElementById('set-mail-all').value.trim());
-  document.getElementById('set-mail-msg').classList.remove('hidden');
-  setTimeout(function(){document.getElementById('set-mail-msg').classList.add('hidden');}, 2000);
+  if(!cloudData) cloudData = {};
+  cloudData.mail_settings = {
+    order: document.getElementById('set-mail-order').value.trim(),
+    receive: document.getElementById('set-mail-receive').value.trim(),
+    complete: document.getElementById('set-mail-complete').value.trim(),
+    all: document.getElementById('set-mail-all').value.trim()
+  };
+  saveToCloud().then(function(){
+    document.getElementById('set-mail-msg').classList.remove('hidden');
+    setTimeout(function(){document.getElementById('set-mail-msg').classList.add('hidden');}, 2000);
+  });
 }
-function updateUserDisplay(){
   var u = getUser();
   document.getElementById('user-display').textContent = u.name ? u.name+'('+u.id+')' : '';
 }
@@ -405,13 +401,15 @@ function resetScan(){
 // ===== メール通知 =====
 function showNotifyButton(action, item, qty){
   var btn = document.getElementById('notify-btn');
+  var ms = (cloudData && cloudData.mail_settings) || {};
   var toMap = {
-    '出庫': localStorage.getItem('rfe_mail_order')||'',
-    '補充手配': localStorage.getItem('rfe_mail_receive')||'',
-    '入庫': localStorage.getItem('rfe_mail_complete')||'',
-    'レシーブ完了': localStorage.getItem('rfe_mail_all')||''
+    '出庫': ms.order||'',
+    '補充手配': ms.receive||'',
+    '入庫': ms.complete||'',
+    'レシーブ完了': ms.all||''
   };
   var to = toMap[action];
+  if(!to){ btn.style.display='none'; return; }
   if(!to){ btn.style.display='none'; return; }
   var u = getUser();
   var subject = encodeURIComponent('[RFE装備品] '+action+': '+item.name+' '+item.size);
